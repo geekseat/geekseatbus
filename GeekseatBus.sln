@@ -1,0 +1,90 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "GeekseatBus", "src\GeekseatBus\GeekseatBus.xproj", "{B6346089-5204-4D8B-B394-BC02FFB9D475}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Playground", "Playground", "{02036D3C-A524-415C-B6C5-07E70664DD91}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Messages", "Messages", "{59B65967-6D00-4377-9AFB-DAF28705AF28}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "GeekseatBus.Playground.ClientA.Messages", "src\Playground\GeekseatBus.Playground.ClientA.Messages\GeekseatBus.Playground.ClientA.Messages.xproj", "{39EF67AB-FF22-4FB5-AEBA-9EB07DCCA0C9}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "GeekseatBus.Playground.ServiceA.Messages", "src\Playground\GeekseatBus.Playground.ServiceA.Messages\GeekseatBus.Playground.ServiceA.Messages.xproj", "{E9878639-03AE-49D4-B5E2-0BBA16FD0A14}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "GeekseatBus.Playground.ServiceB.Messages", "src\Playground\GeekseatBus.Playground.ServiceB.Messages\GeekseatBus.Playground.ServiceB.Messages.xproj", "{6FF734BB-49E4-4993-9F73-34B4CFDDE671}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "GeekseatBus.Playground.ServiceC.Messages", "src\Playground\GeekseatBus.Playground.ServiceC.Messages\GeekseatBus.Playground.ServiceC.Messages.xproj", "{663C6D6C-9289-482B-BF89-69742DFE72CB}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "GeekseatBus.Playground.ClientA", "src\Playground\GeekseatBus.Playground.ClientA\GeekseatBus.Playground.ClientA.xproj", "{647BD265-6CEF-44B7-A533-2B55AA40D9C8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{1E246DB5-3C10-4756-848F-68750D77EBF3}"
+	ProjectSection(SolutionItems) = preProject
+		global.json = global.json
+	EndProjectSection
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "GeekseatBus.Playground.ServiceA", "src\Playground\GeekseatBus.Playground.ServiceA\GeekseatBus.Playground.ServiceA.xproj", "{0F990BC2-44C7-4819-829D-2E47CBCA4DE2}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "GeekseatBus.Playground.ServiceB", "src\Playground\GeekseatBus.Playground.ServiceB\GeekseatBus.Playground.ServiceB.xproj", "{DEBC8BF0-3EC1-4777-9830-8B38C26D7A9F}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "GeekseatBus.Playground.ServiceC", "src\Playground\GeekseatBus.Playground.ServiceC\GeekseatBus.Playground.ServiceC.xproj", "{BC5118A7-5B37-44C2-873A-5F6EC865F5E9}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B6346089-5204-4D8B-B394-BC02FFB9D475}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B6346089-5204-4D8B-B394-BC02FFB9D475}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B6346089-5204-4D8B-B394-BC02FFB9D475}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B6346089-5204-4D8B-B394-BC02FFB9D475}.Release|Any CPU.Build.0 = Release|Any CPU
+		{39EF67AB-FF22-4FB5-AEBA-9EB07DCCA0C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{39EF67AB-FF22-4FB5-AEBA-9EB07DCCA0C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{39EF67AB-FF22-4FB5-AEBA-9EB07DCCA0C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{39EF67AB-FF22-4FB5-AEBA-9EB07DCCA0C9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E9878639-03AE-49D4-B5E2-0BBA16FD0A14}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E9878639-03AE-49D4-B5E2-0BBA16FD0A14}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E9878639-03AE-49D4-B5E2-0BBA16FD0A14}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E9878639-03AE-49D4-B5E2-0BBA16FD0A14}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6FF734BB-49E4-4993-9F73-34B4CFDDE671}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6FF734BB-49E4-4993-9F73-34B4CFDDE671}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6FF734BB-49E4-4993-9F73-34B4CFDDE671}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6FF734BB-49E4-4993-9F73-34B4CFDDE671}.Release|Any CPU.Build.0 = Release|Any CPU
+		{663C6D6C-9289-482B-BF89-69742DFE72CB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{663C6D6C-9289-482B-BF89-69742DFE72CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{663C6D6C-9289-482B-BF89-69742DFE72CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{663C6D6C-9289-482B-BF89-69742DFE72CB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{647BD265-6CEF-44B7-A533-2B55AA40D9C8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{647BD265-6CEF-44B7-A533-2B55AA40D9C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{647BD265-6CEF-44B7-A533-2B55AA40D9C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{647BD265-6CEF-44B7-A533-2B55AA40D9C8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0F990BC2-44C7-4819-829D-2E47CBCA4DE2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0F990BC2-44C7-4819-829D-2E47CBCA4DE2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0F990BC2-44C7-4819-829D-2E47CBCA4DE2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0F990BC2-44C7-4819-829D-2E47CBCA4DE2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DEBC8BF0-3EC1-4777-9830-8B38C26D7A9F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DEBC8BF0-3EC1-4777-9830-8B38C26D7A9F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DEBC8BF0-3EC1-4777-9830-8B38C26D7A9F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DEBC8BF0-3EC1-4777-9830-8B38C26D7A9F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BC5118A7-5B37-44C2-873A-5F6EC865F5E9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BC5118A7-5B37-44C2-873A-5F6EC865F5E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BC5118A7-5B37-44C2-873A-5F6EC865F5E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BC5118A7-5B37-44C2-873A-5F6EC865F5E9}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{59B65967-6D00-4377-9AFB-DAF28705AF28} = {02036D3C-A524-415C-B6C5-07E70664DD91}
+		{39EF67AB-FF22-4FB5-AEBA-9EB07DCCA0C9} = {59B65967-6D00-4377-9AFB-DAF28705AF28}
+		{E9878639-03AE-49D4-B5E2-0BBA16FD0A14} = {59B65967-6D00-4377-9AFB-DAF28705AF28}
+		{6FF734BB-49E4-4993-9F73-34B4CFDDE671} = {59B65967-6D00-4377-9AFB-DAF28705AF28}
+		{663C6D6C-9289-482B-BF89-69742DFE72CB} = {59B65967-6D00-4377-9AFB-DAF28705AF28}
+		{647BD265-6CEF-44B7-A533-2B55AA40D9C8} = {02036D3C-A524-415C-B6C5-07E70664DD91}
+		{0F990BC2-44C7-4819-829D-2E47CBCA4DE2} = {02036D3C-A524-415C-B6C5-07E70664DD91}
+		{DEBC8BF0-3EC1-4777-9830-8B38C26D7A9F} = {02036D3C-A524-415C-B6C5-07E70664DD91}
+		{BC5118A7-5B37-44C2-873A-5F6EC865F5E9} = {02036D3C-A524-415C-B6C5-07E70664DD91}
+	EndGlobalSection
+EndGlobal
