@@ -60,6 +60,8 @@ namespace GeekseatBus
             _serviceQueue = entryNamespace;
             _channel.QueueDeclare(_serviceQueue, true, false, false, null);
 
+            if (_busConfig.SendOnly) return;
+
             Expression<Func<Type, bool>> realTypeFilter =
                 t => !t.GetTypeInfo().IsInterface && !t.GetTypeInfo().IsAbstract;
             Expression<Func<Type, bool>> conventionFilter =

@@ -9,7 +9,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Messages", "Messages", "{59
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{1E246DB5-3C10-4756-848F-68750D77EBF3}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GeekseatBus", "src\GeekseatBus\GeekseatBus.csproj", "{B6346089-5204-4D8B-B394-BC02FFB9D475}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GeekseatBusX", "src\GeekseatBus\GeekseatBusX.csproj", "{B6346089-5204-4D8B-B394-BC02FFB9D475}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GeekseatBus.Playground.ClientA.Messages", "src\Playground\GeekseatBus.Playground.ClientA.Messages\GeekseatBus.Playground.ClientA.Messages.csproj", "{39EF67AB-FF22-4FB5-AEBA-9EB07DCCA0C9}"
 EndProject

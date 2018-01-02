@@ -13,7 +13,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\GeekseatBus\GeekseatBus.csproj" />
+    <ProjectReference Include="..\..\GeekseatBus\GeekseatBusX.csproj" />
     <ProjectReference Include="..\GeekseatBus.Playground.ServiceC.Messages\GeekseatBus.Playground.ServiceC.Messages.csproj" />
   </ItemGroup>
 
