@@ -85,11 +85,9 @@ namespace GeekseatBus
                     !messageType.Namespace.EndsWith(EventNamespaceMarker))
                     continue;
 
-                if (messageType.Namespace.StartsWith(entryNamespace))
-                {
-                    _channel.ExchangeDeclare(messageType.FullName, ExchangeType.Direct, true, false, null);
-                }
-                else
+                _channel.ExchangeDeclare(messageType.FullName, ExchangeType.Topic, true, false, null);
+
+                if (!messageType.Namespace.StartsWith(entryNamespace))
                 {
                     _channel.QueueBind(_serviceQueue, messageType.FullName, "", null);
                 }
