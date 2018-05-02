@@ -3,7 +3,9 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Net.Http.Headers;
 using System.Reflection;
+using System.Threading.Tasks;
 using GeekseatBus.Serializations;
 using Microsoft.Extensions.DependencyInjection;
 using RabbitMQ.Client;
@@ -17,6 +19,9 @@ namespace GeekseatBus
         private const string MessageNamespaceMarker = ".Messages";
         private const string CommandNamespaceMarker = ".Messages.Commands";
         private const string EventNamespaceMarker = ".Messages.Events";
+        private const string DeadLetterQueue = "dead.letter.queue";
+        private const int RetryDelay = 5000; //ms
+        private const int MaxRetryCount = 5;
 
         private readonly IDictionary<string, Type> _typeMap = new ConcurrentDictionary<string, Type>();
         private readonly GsBusConfig _busConfig;
@@ -58,7 +63,9 @@ namespace GeekseatBus
             var entryAssembly = Assembly.GetEntryAssembly();
             var entryNamespace = entryAssembly.EntryPoint.DeclaringType.Namespace ?? string.Empty;
             _serviceQueue = entryNamespace;
-            _channel.QueueDeclare(_serviceQueue, true, false, false, null);
+            _channel.QueueDeclare(DeadLetterQueue, true, false, false);
+            _channel.QueueDeclare(_serviceQueue, true, false, false);
+            _channel.BasicQos(0, 1, false);
 
             if (_busConfig.SendOnly) return;
 
@@ -203,17 +210,64 @@ namespace GeekseatBus
         {
             var messageHandlers = new MessageHandlerBuilder(_serviceProvider);
             var consumer = new EventingBasicConsumer(_channel);
-            consumer.Received += (sender, message) =>
+            consumer.Received += async (sender, message) =>
             {
                 var props = message.BasicProperties;
+                var deliveryTag = message.DeliveryTag;
                 var actualMessageType = _typeMap[props.Type];
                 var actualMessage = _serializer.Deserialize(message.Body, actualMessageType);
 
-                typeof(MessageHandlerBuilder).GetMethod("HandleMessages")
-                    .MakeGenericMethod(actualMessage.GetType()).Invoke(messageHandlers, new[] { actualMessage });
+                var method = typeof(MessageHandlerBuilder).GetMethod("HandleMessages").MakeGenericMethod(actualMessage.GetType());
+
+                var success = await HandleMessage(method, messageHandlers, actualMessage, deliveryTag);
+
+                if (!success)
+                {
+                    SendToDeadLetterQueue(message.BasicProperties, message.Body);
+                }
             };
 
-            _consumerTag = _channel.BasicConsume(consumer, _serviceQueue, true);
+            _consumerTag = _channel.BasicConsume(consumer, _serviceQueue, false);
         }
+
+        private async Task<bool> HandleMessage(MethodInfo method, MessageHandlerBuilder messageHandlers, object actualMessage, ulong deliveryTag)
+        {
+            var retryCount = 0;
+            Retry:
+            try
+            {
+                method.Invoke(messageHandlers, new[] { actualMessage });
+
+                _channel.BasicAck(deliveryTag, false);
+
+                Console.WriteLine("Ack");
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                if (retryCount < MaxRetryCount)
+                {
+                    await Task.Delay(RetryDelay);
+
+                    retryCount++;
+
+                    //todo log retrying                    
+                    goto Retry;
+                }
+
+                //send to dead.letter exchange
+                _channel.BasicNack(deliveryTag, false, false);
+
+                //todo log error
+                return false;
+            }
+        }
+
+        private void SendToDeadLetterQueue(IBasicProperties properties, byte[] bodyBytes)
+        {
+            _channel.BasicPublish("", DeadLetterQueue, properties, bodyBytes);
+        }
+
     }
 }

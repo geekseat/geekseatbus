@@ -1,0 +1,13 @@
+{
+  "profiles": {
+    "ConsumerTestApp": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "RmqHostName": "localhost",
+        "RmqVhost": "/",
+        "RmqPassword": "guest",
+        "RmqUserName": "guest"
+      }
+    }
+  }
+}
