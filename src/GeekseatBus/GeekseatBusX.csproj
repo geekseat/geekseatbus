@@ -4,7 +4,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <AssemblyName>GeekseatBusX</AssemblyName>
     <PackageId>GeekseatBusX</PackageId>
-    <PackageVersion>1.2.3</PackageVersion>
+    <PackageVersion>1.2.4</PackageVersion>
     <Authors>GeekseatX</Authors>
     <Description>Simple Service Bus That Works</Description>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
@@ -15,7 +15,7 @@
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-    <Version>1.2.3</Version>
+    <Version>1.2.4</Version>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
