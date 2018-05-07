@@ -32,6 +32,7 @@ namespace GeekseatBus
         private string _serviceQueue;
         private string _consumerTag;
         private bool _disposed;
+        private readonly ISet<string> _eventHandlerTypes = new HashSet<string>();
 
         public bool IsConnected => (_connection?.IsOpen ?? false) && (_channel?.IsOpen ?? false);
 
@@ -94,7 +95,7 @@ namespace GeekseatBus
 
                 _channel.ExchangeDeclare(messageType.FullName, ExchangeType.Topic, true, false, null);
 
-                if (!messageType.Namespace.StartsWith(entryNamespace))
+                if (_eventHandlerTypes.Contains(messageType.FullName))
                 {
                     _channel.QueueBind(_serviceQueue, messageType.FullName, "", null);
                 }
@@ -192,6 +193,14 @@ namespace GeekseatBus
 
                 foreach (var baseCloseGenericType in baseCloseGenericTypes)
                 {
+                    var messageType = baseCloseGenericType.GetGenericArguments()[0];
+
+                    if (messageType.Namespace.EndsWith(EventNamespaceMarker))
+                    {
+                        // this is event handlers
+                        _eventHandlerTypes.Add(messageType.FullName);
+                    }
+
                     serviceCollection.AddTransient(baseCloseGenericType, handlerType);
                 }
             }
