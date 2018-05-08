@@ -25,7 +25,8 @@ namespace GeekseatBus
 
         private readonly IDictionary<string, Type> _typeMap = new ConcurrentDictionary<string, Type>();
         private readonly GsBusConfig _busConfig;
-        private readonly IGsSerializer _serializer;
+        private readonly IServiceCollection _serviceCollection;
+        private IGsSerializer _serializer;
         private IServiceProvider _serviceProvider;
         private IConnection _connection;
         private IModel _channel;
@@ -41,10 +42,39 @@ namespace GeekseatBus
             ConfigureServices(serviceCollection ?? new ServiceCollection());
 
             _busConfig = busConfig;
-            _serializer = _serviceProvider.GetService<IGsSerializer>();
+            _serviceCollection = serviceCollection;            
+            //_serializer = _serviceProvider.GetService<IGsSerializer>();
         }
 
-        public GsBus() : this(new GsBusConfig()) { }
+        public GsBus() : this(new GsBusConfig())
+        {
+
+        }
+
+        public void SetServiceProvider(IServiceProvider serviceProvider)
+        {
+            _serviceProvider = serviceProvider;
+        }
+
+        private IServiceProvider GetServiceProvider()
+        {
+            if (_serviceProvider == null)
+            {
+                _serviceProvider = _serviceCollection.BuildServiceProvider();
+            }
+
+            return _serviceProvider;
+        }
+
+        private IGsSerializer GetSerializer()
+        {
+            if (_serializer == null)
+            {
+                _serializer = GetServiceProvider().GetService<IGsSerializer>();
+            }
+
+            return _serializer;
+        }
 
         public void Connect()
         {
@@ -136,7 +166,7 @@ namespace GeekseatBus
                 Type = command.GetType().FullName
             };
 
-            _channel.BasicPublish("", targetQueueName, props, _serializer.Serialize(command));
+            _channel.BasicPublish("", targetQueueName, props, GetSerializer().Serialize(command));
         }
 
         public void Publish<T>(T eventMessage)
@@ -151,7 +181,7 @@ namespace GeekseatBus
                 Type = eventMessage.GetType().FullName
             };
 
-            _channel.BasicPublish(targetExchange, "", props, _serializer.Serialize(eventMessage));
+            _channel.BasicPublish(targetExchange, "", props, GetSerializer().Serialize(eventMessage));
         }
 
         public void Dispose()
@@ -212,19 +242,21 @@ namespace GeekseatBus
 
             serviceCollection.AddSingleton<IGsBus>(this);
 
-            _serviceProvider = serviceCollection.BuildServiceProvider();
+            //_serviceProvider = _serviceProvider ?? serviceCollection.BuildServiceProvider();
+
+            //_serializer = _serviceProvider.GetService<IGsSerializer>();
         }
 
         private void DiscoverHandlers()
         {
-            var messageHandlers = new MessageHandlerBuilder(_serviceProvider);
+            var messageHandlers = new MessageHandlerBuilder(GetServiceProvider());
             var consumer = new EventingBasicConsumer(_channel);
             consumer.Received += async (sender, message) =>
             {
                 var props = message.BasicProperties;
                 var deliveryTag = message.DeliveryTag;
                 var actualMessageType = _typeMap[props.Type];
-                var actualMessage = _serializer.Deserialize(message.Body, actualMessageType);
+                var actualMessage = GetSerializer().Deserialize(message.Body, actualMessageType);
 
                 var method = typeof(MessageHandlerBuilder).GetMethod("HandleMessages").MakeGenericMethod(actualMessage.GetType());
 
