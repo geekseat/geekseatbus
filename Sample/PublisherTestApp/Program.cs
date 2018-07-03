@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using GeekseatBus;
 using Handler.Messages.Commands;
 using Microsoft.Extensions.Configuration;
@@ -41,7 +42,12 @@ namespace Publisher
                     Address = $"Address for user {id}"
                 };
 
-                bus.Send(message);
+                var header = new Dictionary<string, object>
+                {
+                    ["tenantId"] = "d1cfef8f-3a6e-44e8-a5ed-34a34230e2ef"
+                };
+
+                bus.Send(header, message);
 
                 Console.WriteLine($"Message is sent:\n {JsonConvert.SerializeObject(message, Formatting.Indented)}");
             }

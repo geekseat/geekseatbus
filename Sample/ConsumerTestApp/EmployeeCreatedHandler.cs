@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using GeekseatBus;
 using Handler.Messages.Commands;
 using Newtonsoft.Json;
@@ -7,11 +8,13 @@ namespace Handler
 {
     public class EmployeeCreatedHandler : IGsHandler<CreateEmployee>
     {
-        public void Handle(CreateEmployee message)
+        public void Handle(IDictionary<string, object> headers, CreateEmployee message)
         {
             var msgName = message.GetType().Name;
 
-            Console.WriteLine($"Handle {msgName}:\n{JsonConvert.SerializeObject(message, Formatting.Indented)}");
+            string tenantId = GetTenantId(headers);
+
+            Console.WriteLine($"Handle {msgName}:\nTenantId: {tenantId}\nBody: {JsonConvert.SerializeObject(message, Formatting.Indented)}");
 
             Console.WriteLine("Press any key to handle the message or press e to simulate exception.");
 
@@ -25,6 +28,13 @@ namespace Handler
             }
 
             Console.WriteLine("Message is handled");
+        }
+
+        private static string GetTenantId(IDictionary<string, object> headers)
+        {
+            var encodedTenantId = headers != null && headers.ContainsKey("tenantId") ? headers["tenantId"] as byte[] : null;
+
+            return encodedTenantId == null ? null : System.Text.Encoding.UTF8.GetString(encodedTenantId);
         }
     }
 }

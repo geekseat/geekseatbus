@@ -154,6 +154,11 @@ namespace GeekseatBus
 
         public void Send<T>(T command)
         {
+            Send(null, command);
+        }
+
+        public void Send<T>(IDictionary<string, object> headers, T command)
+        {
             if (command == null) return;
 
             var commandNamespace = command.GetType().Namespace ?? string.Empty;
@@ -163,13 +168,19 @@ namespace GeekseatBus
             var targetQueueName = commandNamespace.Replace(CommandNamespaceMarker, "");
             var props = new BasicProperties
             {
-                Type = command.GetType().FullName
+                Type = command.GetType().FullName,
+                Headers = headers
             };
 
             _channel.BasicPublish("", targetQueueName, props, GetSerializer().Serialize(command));
         }
 
         public void Publish<T>(T eventMessage)
+        {
+            Publish(null, eventMessage);
+        }
+
+        public void Publish<T>(IDictionary<string, object> headers, T eventMessage)
         {
             if (eventMessage == null || string.IsNullOrEmpty(eventMessage.GetType().Namespace) ||
                 !eventMessage.GetType().Namespace.EndsWith(EventNamespaceMarker))
@@ -178,7 +189,8 @@ namespace GeekseatBus
             var targetExchange = eventMessage.GetType().FullName;
             var props = new BasicProperties
             {
-                Type = eventMessage.GetType().FullName
+                Type = eventMessage.GetType().FullName,
+                Headers = headers
             };
 
             _channel.BasicPublish(targetExchange, "", props, GetSerializer().Serialize(eventMessage));
@@ -249,18 +261,20 @@ namespace GeekseatBus
 
         private void DiscoverHandlers()
         {
-            var messageHandlers = new MessageHandlerBuilder(GetServiceProvider());
+            var serviceProvider = GetServiceProvider();
+            var messageHandlers = new MessageHandlerBuilder(serviceProvider);
             var consumer = new EventingBasicConsumer(_channel);
             consumer.Received += async (sender, message) =>
             {
-                var props = message.BasicProperties;
+                var props = message.BasicProperties;                
                 var deliveryTag = message.DeliveryTag;
-                var actualMessageType = _typeMap[props.Type];
+                var headers = props.Headers;
+                var actualMessageType = _typeMap[props.Type];                
                 var actualMessage = GetSerializer().Deserialize(message.Body, actualMessageType);
 
                 var method = typeof(MessageHandlerBuilder).GetMethod("HandleMessages").MakeGenericMethod(actualMessage.GetType());
 
-                var success = await HandleMessage(method, messageHandlers, actualMessage, deliveryTag);
+                var success = await HandleMessage(method, messageHandlers, headers, actualMessage, deliveryTag);
 
                 if (!success)
                 {
@@ -271,13 +285,13 @@ namespace GeekseatBus
             _consumerTag = _channel.BasicConsume(consumer, _serviceQueue, false);
         }
 
-        private async Task<bool> HandleMessage(MethodInfo method, MessageHandlerBuilder messageHandlers, object actualMessage, ulong deliveryTag)
+        private async Task<bool> HandleMessage(MethodInfo method, MessageHandlerBuilder messageHandlers, IDictionary<string, object> headers, object actualMessage, ulong deliveryTag)
         {
             var retryCount = 0;
             Retry:
             try
             {
-                method.Invoke(messageHandlers, new[] { actualMessage });
+                method.Invoke(messageHandlers, new[] { headers, actualMessage });
 
                 _channel.BasicAck(deliveryTag, false);
 
@@ -309,6 +323,5 @@ namespace GeekseatBus
         {
             _channel.BasicPublish("", DeadLetterQueue, properties, bodyBytes);
         }
-
     }
 }
