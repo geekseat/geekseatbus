@@ -24,7 +24,8 @@ namespace Publisher
                 UserName = config["RmqUserName"],
                 Password = config["RmqPassword"],
                 VirtualHost = config["RmqVHost"],
-                //SendOnly = false
+                SerializerType = SerializerType.Json
+                //SendOnly = false                
             }, services);
 
             bus.Connect();

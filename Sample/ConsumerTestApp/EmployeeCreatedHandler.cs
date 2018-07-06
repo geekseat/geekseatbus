@@ -2,12 +2,20 @@
 using System.Collections.Generic;
 using GeekseatBus;
 using Handler.Messages.Commands;
+using Handler.Messages.Events;
 using Newtonsoft.Json;
 
 namespace Handler
 {
     public class EmployeeCreatedHandler : IGsHandler<CreateEmployee>
     {
+        private readonly IGsBus _bus;
+
+        public EmployeeCreatedHandler(IGsBus bus)
+        {
+            _bus = bus;
+        }
+
         public void Handle(IDictionary<string, object> headers, CreateEmployee message)
         {
             var msgName = message.GetType().Name;
@@ -28,6 +36,13 @@ namespace Handler
             }
 
             Console.WriteLine("Message is handled");
+
+            _bus.Publish(headers, new EmployeeCreatedEvent
+            {
+                Id = message.Id,
+                Name = message.Name,
+                Address = message.Address
+            });
         }
 
         private static string GetTenantId(IDictionary<string, object> headers)

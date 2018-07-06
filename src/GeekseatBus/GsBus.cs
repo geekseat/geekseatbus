@@ -249,7 +249,7 @@ namespace GeekseatBus
 
             if (serviceCollection.All(sd => sd.ServiceType != typeof(IGsSerializer)))
             {
-                serviceCollection.AddTransient<IGsSerializer>(sp => new GsAvroSerializer());
+                serviceCollection.AddTransient<IGsSerializer>(sp => CreateSerializer());
             }
 
             serviceCollection.AddSingleton<IGsBus>(this);
@@ -257,6 +257,16 @@ namespace GeekseatBus
             //_serviceProvider = _serviceProvider ?? serviceCollection.BuildServiceProvider();
 
             //_serializer = _serviceProvider.GetService<IGsSerializer>();
+        }
+
+        private IGsSerializer CreateSerializer()
+        {
+            if (_busConfig?.SerializerType == SerializerType.Avro)
+            {
+                return new GsAvroSerializer();
+            }
+
+            return new GsJsonSerializer();
         }
 
         private void DiscoverHandlers()

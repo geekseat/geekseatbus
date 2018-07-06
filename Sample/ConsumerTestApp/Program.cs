@@ -21,6 +21,7 @@ namespace Handler
                 UserName = config["RmqUserName"],
                 Password = config["RmqPassword"],
                 VirtualHost = config["RmqVHost"],
+                SerializerType = SerializerType.Json
                 //SendOnly = false
             }, services);
 

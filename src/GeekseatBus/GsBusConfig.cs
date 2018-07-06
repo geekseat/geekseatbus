@@ -7,6 +7,7 @@
         public string UserName { get; set; }
         public string Password { get; set; }
         public bool SendOnly { get; set; }
+        public SerializerType SerializerType { get; set; }
 
         public GsBusConfig()
         {
@@ -14,6 +15,7 @@
             VirtualHost = "/";
             UserName = "guest";
             Password = "guest";
+            SerializerType = SerializerType.Avro;
         }
     }
 }
