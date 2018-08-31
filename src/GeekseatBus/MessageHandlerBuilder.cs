@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace GeekseatBus
@@ -13,13 +14,13 @@ namespace GeekseatBus
             _serviceProvider = serviceProvider;
         }
 
-        public void HandleMessages<T>(Dictionary<string, object> headers, T message)
+        public async Task HandleMessagesAsync<T>(Dictionary<string, object> headers, T message)
         {
             var handlers = _serviceProvider.GetServices<IGsHandler<T>>();
 
             foreach (var handler in handlers)
             {
-                handler.Handle(headers, message);
+                await handler.Handle(headers, message);
             }
         }
     }

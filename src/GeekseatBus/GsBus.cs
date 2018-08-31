@@ -8,6 +8,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using GeekseatBus.Serializations;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using RabbitMQ.Client.Framing;
@@ -20,7 +21,7 @@ namespace GeekseatBus
         private const string CommandNamespaceMarker = ".Messages.Commands";
         private const string EventNamespaceMarker = ".Messages.Events";
         private const string DeadLetterQueue = "dead.letter.queue";
-        private const int RetryDelay = 5000; //ms
+        private const int RetryDelay = 1000; //ms
         private const int MaxRetryCount = 5;
 
         private readonly IDictionary<string, Type> _typeMap = new ConcurrentDictionary<string, Type>();
@@ -85,7 +86,10 @@ namespace GeekseatBus
                 HostName = _busConfig.HostName,
                 VirtualHost = _busConfig.VirtualHost,
                 UserName = _busConfig.UserName,
-                Password = _busConfig.Password
+                Password = _busConfig.Password,
+                AutomaticRecoveryEnabled = true,
+                RequestedHeartbeat = 5,
+                NetworkRecoveryInterval = TimeSpan.FromSeconds(5)
             };
 
             _connection = factory.CreateConnection();
@@ -172,7 +176,10 @@ namespace GeekseatBus
                 Headers = headers
             };
 
-            _channel.BasicPublish("", targetQueueName, props, GetSerializer().Serialize(command));
+            lock (_channel)
+            {
+                _channel.BasicPublish("", targetQueueName, props, GetSerializer().Serialize(command));
+            }
         }
 
         public void Publish<T>(T eventMessage)
@@ -193,7 +200,10 @@ namespace GeekseatBus
                 Headers = headers
             };
 
-            _channel.BasicPublish(targetExchange, "", props, GetSerializer().Serialize(eventMessage));
+            lock (_channel)
+            {
+                _channel.BasicPublish(targetExchange, "", props, GetSerializer().Serialize(eventMessage));
+            }
         }
 
         public void Dispose()
@@ -282,35 +292,47 @@ namespace GeekseatBus
                 var actualMessageType = _typeMap[props.Type];                
                 var actualMessage = GetSerializer().Deserialize(message.Body, actualMessageType);
 
-                var method = typeof(MessageHandlerBuilder).GetMethod("HandleMessages").MakeGenericMethod(actualMessage.GetType());
+                var method = typeof(MessageHandlerBuilder).GetMethod("HandleMessagesAsync").MakeGenericMethod(actualMessage.GetType());
 
-                var success = await HandleMessage(method, messageHandlers, headers, actualMessage, deliveryTag);
+                var (canHandle, errorMessage) = await HandleMessage(method, messageHandlers, headers, actualMessage, deliveryTag);
 
-                if (!success)
+                if (!canHandle)
                 {
                     SendToDeadLetterQueue(message.BasicProperties, message.Body);
                 }
             };
 
-            _consumerTag = _channel.BasicConsume(consumer, _serviceQueue, false);
+            lock (_channel)
+            {
+                _consumerTag = _channel.BasicConsume(consumer, _serviceQueue, false);
+            }
         }
 
-        private async Task<bool> HandleMessage(MethodInfo method, MessageHandlerBuilder messageHandlers, IDictionary<string, object> headers, object actualMessage, ulong deliveryTag)
+        private async Task<(bool, string)> HandleMessage(MethodInfo method, MessageHandlerBuilder messageHandlers, IDictionary<string, object> headers, object actualMessage, ulong deliveryTag)
         {
             var retryCount = 0;
             Retry:
             try
             {
-                method.Invoke(messageHandlers, new[] { headers, actualMessage });
+                await (Task)method.Invoke(messageHandlers, new[] { headers, actualMessage });
 
-                _channel.BasicAck(deliveryTag, false);
+                lock (_channel)
+                {
+                    _channel.BasicAck(deliveryTag, false);
+                }
 
-                Console.WriteLine("Ack");
+                //Console.WriteLine("Ack");
 
-                return true;
+                return (true, null);
             }
             catch (Exception ex)
             {
+                var body = JsonConvert.SerializeObject(actualMessage);
+
+                var message = $"Error while handle message: {actualMessage.GetType().FullName}\n{ex.Message}\n{ex.StackTrace}";
+
+                Console.WriteLine(message);
+
                 if (retryCount < MaxRetryCount)
                 {
                     await Task.Delay(RetryDelay);
@@ -321,17 +343,23 @@ namespace GeekseatBus
                     goto Retry;
                 }
 
-                //send to dead.letter exchange
-                _channel.BasicNack(deliveryTag, false, false);
+                lock (_channel)
+                {
+                    //send to dead.letter exchange
+                    _channel.BasicNack(deliveryTag, true, true);
+                }
 
                 //todo log error
-                return false;
+                return (false, message);
             }
         }
 
         private void SendToDeadLetterQueue(IBasicProperties properties, byte[] bodyBytes)
         {
-            _channel.BasicPublish("", DeadLetterQueue, properties, bodyBytes);
+            lock (_channel)
+            {
+                _channel.BasicPublish("", DeadLetterQueue, properties, bodyBytes);
+            }
         }
     }
 }

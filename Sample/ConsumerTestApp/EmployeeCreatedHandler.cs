@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using GeekseatBus;
 using Handler.Messages.Commands;
 using Handler.Messages.Events;
@@ -16,7 +17,7 @@ namespace Handler
             _bus = bus;
         }
 
-        public void Handle(IDictionary<string, object> headers, CreateEmployee message)
+        public Task Handle(IDictionary<string, object> headers, CreateEmployee message)
         {
             var msgName = message.GetType().Name;
 
@@ -43,6 +44,8 @@ namespace Handler
                 Name = message.Name,
                 Address = message.Address
             });
+
+            return Task.FromResult(true);
         }
 
         private static string GetTenantId(IDictionary<string, object> headers)

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using GeekseatBus;
 using Handler.Messages.Commands;
 using Handler.Messages.Events;
@@ -9,13 +10,15 @@ namespace Handler
 {
     public class EmployeeCreatedEventHandler : IGsHandler<EmployeeCreatedEvent>
     {
-        public void Handle(IDictionary<string, object> headers, EmployeeCreatedEvent message)
+        public Task Handle(IDictionary<string, object> headers, EmployeeCreatedEvent message)
         {
             var msgName = message.GetType().Name;
 
             string tenantId = GetTenantId(headers);
 
             Console.WriteLine($"Handle {msgName}:\nTenantId: {tenantId}\nBody: {JsonConvert.SerializeObject(message, Formatting.Indented)}");
+
+            return Task.FromResult(true);
         }
 
         private static string GetTenantId(IDictionary<string, object> headers)
