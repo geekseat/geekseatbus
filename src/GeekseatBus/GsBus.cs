@@ -346,7 +346,7 @@ namespace GeekseatBus
                 lock (_channel)
                 {
                     //send to dead.letter exchange
-                    _channel.BasicNack(deliveryTag, true, true);
+                    _channel.BasicNack(deliveryTag, false, false);
                 }
 
                 //todo log error
