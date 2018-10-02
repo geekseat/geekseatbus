@@ -24,7 +24,7 @@ namespace GeekseatBus
         private const int RetryDelay = 1000; //ms
         private const int MaxRetryCount = 5;
 
-        private readonly IDictionary<string, Type> _typeMap = new ConcurrentDictionary<string, Type>();
+        private readonly ConcurrentDictionary<string, Type> _typeMap = new ConcurrentDictionary<string, Type>();
         private readonly GsBusConfig _busConfig;
         private readonly IServiceCollection _serviceCollection;
         private IGsSerializer _serializer;
@@ -120,7 +120,7 @@ namespace GeekseatBus
             foreach (var messageType in messageTypes)
             {
                 if (!_typeMap.ContainsKey(messageType.FullName))
-                    _typeMap.Add(messageType.FullName, messageType);
+                    _typeMap.TryAdd(messageType.FullName, messageType);
 
                 // Skip if namespace not ended with .Messages.Events
                 if (string.IsNullOrEmpty(messageType.Namespace) ||
@@ -289,7 +289,12 @@ namespace GeekseatBus
                 var props = message.BasicProperties;                
                 var deliveryTag = message.DeliveryTag;
                 var headers = props.Headers;
-                var actualMessageType = _typeMap[props.Type];                
+
+                if (!_typeMap.ContainsKey(props.Type) || !_typeMap.TryGetValue(props.Type, out Type actualMessageType))
+                {
+                    return;
+                }
+
                 var actualMessage = GetSerializer().Deserialize(message.Body, actualMessageType);
 
                 var method = typeof(MessageHandlerBuilder).GetMethod("HandleMessagesAsync").MakeGenericMethod(actualMessage.GetType());
